@@ -1,0 +1,29 @@
+{
+  "name": "insteon-discovery",
+  "version": "1.0.0",
+  "description": "A tool that will automatically populate the homebridge config for the homebridge-insteon-local plugion",
+  "main": "index.js",
+  "bin": {
+    "insteon-discovery": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssyrell/insteon-discovery.git"
+  },
+  "author": "Steve Syrell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ssyrell/insteon-discovery/issues"
+  },
+  "homepage": "https://github.com/ssyrell/insteon-discovery#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
+    "minimist": "^1.2.5"
+  }
+}
