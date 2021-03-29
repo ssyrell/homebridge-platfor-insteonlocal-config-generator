@@ -25,7 +25,7 @@ API_KEY=<Your API Key Here>
 Usage
 -----
 - Clone this repository
-- Ensure you've setup your `.env` file as instructed in the [API Key](./README.md#api-key) section above
+- Ensure you've setup your `.env` file as instructed in the [API Key](https://github.com/ssyrell/homebridge-platform-insteonlocal-config-generator#api-key) section above
 - Run the tool:
 
 ```

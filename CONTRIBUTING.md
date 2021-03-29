@@ -16,7 +16,7 @@ git clone git@github.com:your-username/homebridge-platform-insteonlocal-config-g
 npm install
 ```
 
-3. Setup `.env` file with api key (see [API Key](./README.md#api-key) section of readme)
+3. Setup `.env` file with api key (see [API Key](https://github.com/ssyrell/homebridge-platform-insteonlocal-config-generator#api-key) section of readme)
 
 4. Run:
 ```
