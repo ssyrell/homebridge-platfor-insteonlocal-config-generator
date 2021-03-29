@@ -1,24 +1,24 @@
 {
-  "name": "insteon-discovery",
+  "name": "homebridge-platform-insteonlocal-config-generator",
   "version": "1.0.0",
   "description": "A tool that will automatically populate the homebridge config for the homebridge-insteon-local plugion",
   "main": "index.js",
   "bin": {
-    "insteon-discovery": "index.js"
+    "insteonlocal-config-generator": "index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ssyrell/insteon-discovery.git"
+    "url": "git+https://github.com/ssyrell/homebridge-platform-insteonlocal-config-generator.git"
   },
   "author": "Steve Syrell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ssyrell/insteon-discovery/issues"
+    "url": "https://github.com/ssyrell/homebridge-platform-insteonlocal-config-generator/issues"
   },
-  "homepage": "https://github.com/ssyrell/insteon-discovery#readme",
+  "homepage": "https://github.com/ssyrell/homebridge-platform-insteonlocal-config-generator#readme",
   "dependencies": {
     "axios": "^0.21.1",
     "chalk": "^4.1.0",

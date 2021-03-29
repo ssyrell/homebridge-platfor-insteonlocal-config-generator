@@ -43,7 +43,6 @@ export async function cli(args) {
             }
         }
 
-        //console.log(homebridgeDeviceConfigs);
         console.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices`);
         console.log('***** Unsupported devices: *****');
         console.log(unsupportedDeviceConfigs);
@@ -54,9 +53,7 @@ export async function cli(args) {
             sceneFetchTasks.push(api.getScene(scene.SceneID));
         }
 
-        //const homebridgeSceneConfigs = [];
         const scenes = await Promise.all(sceneFetchTasks);
-        //console.log(scenes);
         for(const scene of scenes) {
             console.log(`Processing scene ${scene.SceneName}`);
             homebridgeDeviceConfigs.push(getSceneHomebridgeConfig(scene, devices));
@@ -81,7 +78,7 @@ export async function cli(args) {
 }
 
 function printUsage() {
-    const usage = chalk.greenBright('insteon-discovery <username> <password>');
+    const usage = chalk.greenBright('insteon-config-generator [username] [password]');
     console.log(usage);
 }
 
