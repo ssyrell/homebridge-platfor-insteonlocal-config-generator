@@ -1,8 +1,16 @@
+interface DeviceType {
+    category: number,
+    subcategory: Number,
+    sku: string,
+    name: string,
+    homebridgeType: string,
+    dimmable?: string
+}
 
 // The below values are based on deviceDatabase.json from 
 // the homebridge-platform-insteonlocal github project.
 // https://github.com/kuestess/homebridge-platform-insteonlocal/blob/master/deviceDatabase.json
-const deviceTypes = [
+const deviceTypes: DeviceType[][] = [
     // Category 0
     [
         null,
@@ -1881,12 +1889,11 @@ const deviceTypes = [
 ];
 
 export class DeviceTypes {
-    static getDeviceInfo(category, subcategory) {
+    static getDeviceInfo(category: number, subcategory: number): DeviceType {
         if (category > deviceTypes.length - 1 || subcategory > deviceTypes[category].length - 1) {
             return null;
         }
 
-        const device = deviceTypes[category][subcategory];
-        return device;
+        return deviceTypes[category][subcategory];
     }
 }
