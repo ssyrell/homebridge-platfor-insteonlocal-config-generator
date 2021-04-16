@@ -7,14 +7,10 @@ import { Token } from '../dataModels'
 export class Api {
     private axiosInstance: AxiosInstance;
 
-    constructor(accessToken?: string) {
+    constructor() {
         this.axiosInstance = axios.create();
         this.axiosInstance.defaults.baseURL = 'https://connect.insteon.com/api/v2';
         this.axiosInstance.defaults.headers.common['Authentication'] = `APIKey ${process.env.API_KEY}`;
-
-        if(accessToken) {
-            this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        }
     }
 
     async getAccessToken(username: string, password: string): Promise<Token> {
@@ -101,6 +97,10 @@ export class Api {
         } catch (error) {
             this.logAxiosError(`Failed to get scene with id of ${sceneId}`, error);
         }
+    }
+
+    setAccessTokenForAllRequests(accessToken: Token): void {
+        this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken.token}`;
     }
 
     private logAxiosError(message: string, error: AxiosError): void{

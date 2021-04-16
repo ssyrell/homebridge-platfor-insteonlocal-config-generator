@@ -1,78 +1,99 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import { parse } from 'querystring';
+
 import { Api, DeviceTypes } from '../insteonApi';
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    const authToken = (req.headers['Authorization'] || req.headers['authorization']).split(' ')[1]; 
-    
-    if (!authToken) {
+    const parsedBody = parse(req.body);
+    const username = parsedBody.username as string;
+    const password = parsedBody.password as string;
+
+    if (!username || !password)
+    {
         context.res = {
             status: 401,
-            body: "Invalid/missing authorization token"
+            body: "Missing username/password in request body"
         };
         return;
     }
 
-    const api = new Api(authToken);
+    const api = new Api();
+    try {
+        const token = await api.getAccessToken(username, password);
+        api.setAccessTokenForAllRequests(token);
+    } catch(error) {
+        context.res = {
+            status: 401,
+            body: "Invalid credentials"
+        };
+        return;
+    }
+
     const houses = await api.getHouses();
-    const firstHouse = await api.getHouse(houses[0].HouseID);
-    const houseDevices = await api.getHouseDevices(firstHouse.HouseID);
-
-    // Get details for all devices
-    const deviceFetchTasks = [];
-    context.log(`Getting properties for ${houseDevices.DeviceList.length} devices`);
-    for (const device of houseDevices.DeviceList)
+    context.log(`Found ${houses.length} houses`);
+    const configurations = [];
+    for (const house of houses)
     {
-        deviceFetchTasks.push(api.getDevice(device.DeviceID));
-    }
+        const houseDevices = await api.getHouseDevices(house.HouseID);
 
-    const homebridgeDeviceConfigs = [];
-    const unsupportedDeviceConfigs = [];
-    const devices = await Promise.all(deviceFetchTasks);
-    for (const device of devices) {
-        const homebridgeConfig = getDeviceHomebridgeConfig(device);
-        if (homebridgeConfig === null || homebridgeConfig.deviceType === 'unsupported') {
-            unsupportedDeviceConfigs.push(device);
-        } else {
-            homebridgeDeviceConfigs.push(homebridgeConfig);
+        // Get details for all devices
+        const deviceFetchTasks = [];
+        context.log(`Getting properties for ${houseDevices.DeviceList.length} devices`);
+        for (const device of houseDevices.DeviceList)
+        {
+            deviceFetchTasks.push(api.getDevice(device.DeviceID));
         }
+
+        const homebridgeDeviceConfigs = [];
+        const unsupportedDeviceConfigs = [];
+        const devices = await Promise.all(deviceFetchTasks);
+        for (const device of devices) {
+            const homebridgeConfig = getDeviceHomebridgeConfig(device);
+            if (homebridgeConfig === null || homebridgeConfig.deviceType === 'unsupported') {
+                unsupportedDeviceConfigs.push(device);
+            } else {
+                homebridgeDeviceConfigs.push(homebridgeConfig);
+            }
+        }
+
+        context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices. ${unsupportedDeviceConfigs.length} devices are unsuppored by homebridge`);
+
+        const houseScenes = await api.getHouseScenes(house.HouseID);
+        const sceneFetchTasks = [];
+        for (const scene of houseScenes.SceneList) {
+            sceneFetchTasks.push(api.getScene(scene.SceneID));
+        }
+
+        const scenes = await Promise.all(sceneFetchTasks);
+        for(const scene of scenes) {
+            context.log(`Processing scene ${scene.SceneID}`);
+            homebridgeDeviceConfigs.push(getSceneHomebridgeConfig(scene, devices, context));
+        }
+
+        configurations.push({
+            homebridgeConfiguration: {
+                platform: 'InsteonLocal',
+                name: 'Insteon Local Platform',
+                user: house.HubUsername,
+                pass: house.HubPassword,
+                host: house.IP,
+                port: house.Port,
+                model: house.HubType === 'HUB2' ? '2245' : '2242',
+                refresh: '0',
+                server_port: '3000',
+                keepAlive: '3600',
+                devices: homebridgeDeviceConfigs
+            },
+            unsupportedDevices: unsupportedDeviceConfigs            
+        });
     }
-
-    context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices`);
-    context.log('***** Unsupported devices: *****');
-    context.log(unsupportedDeviceConfigs);
-
-    const houseScenes = await api.getHouseScenes(firstHouse.HouseID);
-    const sceneFetchTasks = [];
-    for (const scene of houseScenes.SceneList) {
-        sceneFetchTasks.push(api.getScene(scene.SceneID));
-    }
-
-    const scenes = await Promise.all(sceneFetchTasks);
-    for(const scene of scenes) {
-        context.log(`Processing scene ${scene.SceneName}`);
-        homebridgeDeviceConfigs.push(getSceneHomebridgeConfig(scene, devices, context));
-    }
-
-    const config = {
-        platform: 'InsteonLocal',
-        name: 'Insteon Local Platform',
-        user: firstHouse.HubUsername,
-        pass: firstHouse.HubPassword,
-        host: firstHouse.IP,
-        port: firstHouse.Port,
-        model: firstHouse.HubType === 'HUB2' ? '2245' : '2242',
-        refresh: '0',
-        server_port: '3000',
-        keepAlive: '3600',
-        devices: homebridgeDeviceConfigs
-    };
 
     context.res = {
         headers: {
             'Content-Type': 'application/json'
         },
         // status: 200, /* Defaults to 200 */
-        body: JSON.stringify(config)
+        body: JSON.stringify(configurations)
     };
 
 };
@@ -90,7 +111,7 @@ function getDeviceHomebridgeConfig(deviceProperties) {
 
 function getSceneHomebridgeConfig(scene, allDevices, context) {
     const sceneControllers = scene.DeviceList.filter(d => d.DeviceRoleMask === 1 || d.DeviceRoleMask === 3);
-    context.log(`Found ${sceneControllers.length} scene controllers for ${scene.SceneName}`);
+    context.log(`Found ${sceneControllers.length} scene controllers for ${scene.SceneID}`);
 
     let sceneController = null;
     let sceneControllerKeypad = null;
@@ -108,7 +129,7 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
 
         switch(keypads.length) {
             case 0:
-                context.warn(`No keypad controllers found for ${scene.SceneName}`);
+                context.warn(`No keypad controllers found for ${scene.SceneID}`);
                 break;
 
             case 1:
@@ -118,7 +139,7 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
                 break
             
             default:
-                context.warn(`Multiple keypad controllers were found for ${scene.SceneName}: ${keypads.forEach(k => k.DeviceName)}`);
+                context.warn(`Multiple keypad controllers were found for ${scene.SceneID}: ${keypads.forEach(k => k.DeviceID)}`);
                 break;
         }
     }
