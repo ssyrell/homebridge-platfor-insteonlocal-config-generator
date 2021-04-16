@@ -7,8 +7,7 @@
       "name": "req",
       "methods": [
         "post"
-      ],
-      "route": "homebridgeConfiguration/{houseId:int?}"
+      ]
     },
     {
       "type": "http",
