@@ -274,7 +274,7 @@ const deviceTypes: DeviceType[][] = [
             subcategory: 12,
             sku: '2486DWH8',
             name: 'KeypadLinc Dimmer',
-            homebridgeType: 'keypad',
+            homebridgeType: 'dimmer',
             dimmable: 'yes'
         },
         {
@@ -365,7 +365,7 @@ const deviceTypes: DeviceType[][] = [
             subcategory: 27,
             sku: '2486DWH6',
             name: 'KeypadLinc Dimmer',
-            homebridgeType: 'keypad',
+            homebridgeType: 'dimmer',
             dimmable: 'yes'
         },
         {
@@ -373,7 +373,7 @@ const deviceTypes: DeviceType[][] = [
             subcategory: 28,
             sku: '2486DWH8',
             name: 'KeypadLinc Dimmer',
-            homebridgeType: 'keypad',
+            homebridgeType: 'dimmer',
             dimmable: 'yes'
         },
         {
@@ -612,7 +612,7 @@ const deviceTypes: DeviceType[][] = [
             subcategory: 65,
             sku: '2334-222',
             name: 'Keypad Dimmer Dual-Band, 8 Button',
-            homebridgeType: 'keypad',
+            homebridgeType: 'dimmer',
             dimmable: 'yes'
         },
         {
@@ -620,7 +620,7 @@ const deviceTypes: DeviceType[][] = [
             subcategory: 66,
             sku: '2334-232',
             name: 'Keypad Dimmer Dual-Band, 6 Button',
-            homebridgeType: 'keypad',
+            homebridgeType: 'dimmer',
             dimmable: 'yes'
         },
         null,

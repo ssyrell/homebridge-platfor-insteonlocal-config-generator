@@ -46,17 +46,20 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         const homebridgeDeviceConfigs = [];
         const unsupportedDeviceConfigs = [];
+        const ignoredDeviceConfigs = [];
         const devices = await Promise.all(deviceFetchTasks);
         for (const device of devices) {
             const homebridgeConfig = getDeviceHomebridgeConfig(device);
             if (homebridgeConfig === null || homebridgeConfig.deviceType === 'unsupported') {
                 unsupportedDeviceConfigs.push(device);
+            } else if(homebridgeConfig.deviceType === 'remote') {
+                ignoredDeviceConfigs.push(device);
             } else {
                 homebridgeDeviceConfigs.push(homebridgeConfig);
             }
         }
 
-        context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices. ${unsupportedDeviceConfigs.length} devices are unsuppored by homebridge`);
+        context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices. ${unsupportedDeviceConfigs.length} devices are unsuppored by homebridge. Ignored ${ignoredDeviceConfigs.length} devices`);
 
         const houseScenes = await api.getHouseScenes(house.HouseID);
         const sceneFetchTasks = [];
@@ -84,7 +87,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 keepAlive: '3600',
                 devices: homebridgeDeviceConfigs
             },
-            unsupportedDevices: unsupportedDeviceConfigs            
+            unsupportedDevices: unsupportedDeviceConfigs,
+            ignoredDevices: ignoredDeviceConfigs            
         });
     }
 
@@ -103,7 +107,7 @@ function getDeviceHomebridgeConfig(deviceProperties) {
     const dimmable = (homebridgeDeviceType === null || homebridgeDeviceType.dimmable === undefined) ? 'no' : homebridgeDeviceType.dimmable;
     return {
         name: deviceProperties.DeviceName,
-        deviceId: deviceProperties.InsteonID,
+        deviceID: deviceProperties.InsteonID,
         deviceType: homebridgeDeviceType.homebridgeType,
         dimmable: dimmable
     };
@@ -129,7 +133,7 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
 
         switch(keypads.length) {
             case 0:
-                context.warn(`No keypad controllers found for ${scene.SceneID}`);
+                context.log.warn(`No keypad controllers found for ${scene.SceneID}`);
                 break;
 
             case 1:
@@ -139,7 +143,7 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
                 break
             
             default:
-                context.warn(`Multiple keypad controllers were found for ${scene.SceneID}: ${keypads.forEach(k => k.DeviceID)}`);
+                context.log.warn(`Multiple keypad controllers were found for ${scene.SceneID}: ${keypads.forEach(k => k.DeviceID)}`);
                 break;
         }
     }
@@ -154,8 +158,9 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
     if (sceneControllerKeypad === null) {
         return {
             name: scene.SceneName,
-            groupId: scene.Group,
-            groupMembers: groupMembers
+            groupID: scene.Group.toString(),
+            deviceType: 'scene'
+            //groupMembers: groupMembers
         };
     }
 
@@ -163,9 +168,9 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
     const sceneButtonName = sceneButton.GroupName === 'Main Button' ? 'ON' : sceneButton.GroupName.substring(sceneButton.GroupName.length - 1);
     return {
         name: scene.SceneName,
-        groupId: scene.Group.toString(),
-        groupMembers: groupMembers,
-        deviceId: sceneControllerKeypad.InsteonID,
+        groupID: scene.Group.toString(),
+        // groupMembers: groupMembers,
+        deviceID: sceneControllerKeypad.InsteonID,
         six_btn: sceneControllerKeypad.GroupList[0].GroupName === 'Main Button',
         keypadbtn: sceneButtonName,
         dimmable: 'no',
