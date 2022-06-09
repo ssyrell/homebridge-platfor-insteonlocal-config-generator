@@ -17,7 +17,7 @@ API Key
 -------
 This tool requires an Insteon API key in order to talk to the Insteon API. If you do not have one, you can request one [here](https://www.insteon.com/become-an-insteon-developer).
 
-Once you have your API key, add a file named `.env` at the root of the repository with the following content:
+Once you have your API key, modify the `.env` file at the root of the repository and set your api key:
 ```
 API_KEY=<Your API Key Here>
 ```
