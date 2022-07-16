@@ -68,9 +68,11 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         }
 
         const scenes = await Promise.all(sceneFetchTasks);
+        let processedScenes = [];
         for(const scene of scenes) {
             context.log(`Processing scene ${scene.SceneID}`);
             homebridgeDeviceConfigs.push(getSceneHomebridgeConfig(scene, devices, context));
+            processedScenes.push(processScene(scene, devices, context));
         }
 
         configurations.push({
@@ -88,7 +90,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 devices: homebridgeDeviceConfigs
             },
             unsupportedDevices: unsupportedDeviceConfigs,
-            ignoredDevices: ignoredDeviceConfigs            
+            ignoredDevices: ignoredDeviceConfigs,
+            scenes: processedScenes            
         });
     }
 
@@ -176,6 +179,25 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
         dimmable: 'no',
         deviceType: 'scene'
     };
+}
+
+function processScene(scene, allDevices, context) {
+    const updatedDeviceList = [];
+    for(const device of scene.DeviceList) {
+        const deviceDetails = allDevices.filter(d => d.DeviceID === device.DeviceID)[0];
+
+        device.DeviceName = deviceDetails.DeviceName;
+        updatedDeviceList.push(device);
+    }
+
+
+    const updatedScene = {
+        ...scene,
+        DeviceList: updatedDeviceList
+    };
+
+    context.log(JSON.stringify(updatedScene));
+    return updatedScene;
 }
 
 export default httpTrigger;
