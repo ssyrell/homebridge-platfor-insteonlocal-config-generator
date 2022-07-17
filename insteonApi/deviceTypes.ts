@@ -4,7 +4,8 @@ interface DeviceType {
     sku: string,
     name: string,
     homebridgeType: string,
-    dimmable?: string
+    dimmable?: string,
+    canControlScenes?: boolean
 }
 
 // The below values are based on deviceDatabase.json from 
@@ -613,7 +614,8 @@ const deviceTypes: DeviceType[][] = [
             sku: '2334-222',
             name: 'Keypad Dimmer Dual-Band, 8 Button',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: 'yes',
+            canControlScenes: true
         },
         {
             category: 1,
@@ -621,7 +623,8 @@ const deviceTypes: DeviceType[][] = [
             sku: '2334-232',
             name: 'Keypad Dimmer Dual-Band, 6 Button',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: 'yes',
+            canControlScenes: true
         },
         null,
         null,
@@ -716,7 +719,8 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486SWH8',
             name: 'KeypadLinc 8-button On/Off Switch',
             homebridgeType: 'keypad',
-            dimmable: 'no'
+            dimmable: 'no',
+            canControlScenes: true
         },
         {
             category: 2,

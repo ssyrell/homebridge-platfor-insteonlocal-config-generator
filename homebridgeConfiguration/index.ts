@@ -118,7 +118,7 @@ function getDeviceHomebridgeConfig(deviceProperties) {
 
 function getSceneHomebridgeConfig(scene, allDevices, context) {
     const sceneControllers = scene.DeviceList.filter(d => d.DeviceRoleMask === 1 || d.DeviceRoleMask === 3);
-    context.log(`Found ${sceneControllers.length} scene controllers for ${scene.SceneID}`);
+    context.log(`Found ${sceneControllers.length} scene controllers for ${scene.SceneID}: ${JSON.stringify(sceneControllers)}`);
 
     let sceneController = null;
     let sceneControllerKeypad = null;
@@ -128,7 +128,8 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
         for (const controller of sceneControllers) {
             const device = allDevices.filter(d => d.DeviceID === controller.DeviceID)[0];
             const deviceInfo = DeviceTypes.getDeviceInfo(device.DevCat, device.SubCat)
-            if (deviceInfo !== null && deviceInfo.homebridgeType === 'keypad') {
+            context.log(JSON.stringify(deviceInfo));
+            if (deviceInfo !== null && deviceInfo.canControlScenes) {
                 controllers.push(controller);
                 keypads.push(device);
             }
