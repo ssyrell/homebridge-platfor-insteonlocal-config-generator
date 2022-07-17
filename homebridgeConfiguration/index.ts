@@ -3,6 +3,8 @@ import { parse } from 'querystring';
 
 import { Api, DeviceTypes } from '../insteonApi';
 
+const IncludeGroupMembers = false;
+
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     const parsedBody = parse(req.body);
     const username = parsedBody.username as string;
@@ -159,27 +161,37 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
     }
     groupMembers = groupMembers.substring(0, groupMembers.length - 1);
 
+    let config = {};
     if (sceneControllerKeypad === null) {
-        return {
+        config = {
+            ...config,
             name: scene.SceneName,
             groupID: scene.Group.toString(),
             deviceType: 'scene'
-            //groupMembers: groupMembers
+        };
+    }
+    else {
+        const sceneButton = sceneControllerKeypad.GroupList.filter(g => g.SceneID === scene.SceneID || g.DeviceGroupDetailID === sceneController.DeviceGroupDetailID)[0];
+        const sceneButtonName = sceneButton.GroupName === 'Main Button' ? 'ON' : sceneButton.GroupName.substring(sceneButton.GroupName.length - 1);
+        config = {
+            name: scene.SceneName,
+            groupID: scene.Group.toString(),
+            deviceID: sceneControllerKeypad.InsteonID,
+            six_btn: sceneControllerKeypad.GroupList[0].GroupName === 'Main Button',
+            keypadbtn: sceneButtonName,
+            dimmable: 'no',
+            deviceType: 'scene'
         };
     }
 
-    const sceneButton = sceneControllerKeypad.GroupList.filter(g => g.SceneID === scene.SceneID || g.DeviceGroupDetailID === sceneController.DeviceGroupDetailID)[0];
-    const sceneButtonName = sceneButton.GroupName === 'Main Button' ? 'ON' : sceneButton.GroupName.substring(sceneButton.GroupName.length - 1);
-    return {
-        name: scene.SceneName,
-        groupID: scene.Group.toString(),
-        // groupMembers: groupMembers,
-        deviceID: sceneControllerKeypad.InsteonID,
-        six_btn: sceneControllerKeypad.GroupList[0].GroupName === 'Main Button',
-        keypadbtn: sceneButtonName,
-        dimmable: 'no',
-        deviceType: 'scene'
-    };
+    if (IncludeGroupMembers) {
+        config = {
+            ...config,
+            groupMembers
+        };
+    }
+
+    return config;
 }
 
 function processScene(scene, allDevices, context) {
