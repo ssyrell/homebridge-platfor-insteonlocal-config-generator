@@ -1,10 +1,12 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { parse } from 'querystring';
 
-import { Api, DeviceTypes, Room } from '../insteonApi';
+import { Api, Device, DeviceTypes, Dimmable, Room, Scene, SceneDevice } from '../insteonApi';
+import { Configuration, HomebridgeDevice, HomebridgeScene } from "./dataModels";
 
 const IncludeGroupMembers = false;
-const IncludeRoomNameInDeviceName = false;
+const IncludeRoomNameInDeviceName = true;
+const IgnoredDeviceTypes = ['remote'];
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     const parsedBody = parse(req.body);
@@ -34,40 +36,58 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     const houses = await api.getHouses();
     context.log(`Found ${houses.HouseList.length} houses`);
-    const configurations = [];
+    const configurations:  Configuration[] = [];
     for (const houseListHouse of houses.HouseList)
     {
         const houseDevices = await api.getHouseDevices(houseListHouse.HouseID);
 
         // Get details for all devices
-        const deviceFetchTasks = [];
+        const deviceFetchTasks: Promise<Device>[] = [];
         context.log(`Getting properties for ${houseDevices.DeviceList.length} devices`);
         for (const device of houseDevices.DeviceList)
         {
             deviceFetchTasks.push(api.getDevice(device.DeviceID));
         }
 
-        const houseRooms = await api.getHouseRooms(houseListHouse.HouseID);
-        const roomFetchTasks = [];
-        for(const room of houseRooms.RoomList) {
-            roomFetchTasks.push(api.getRoom(room.RoomId));
+        const deviceAndSceneRoomMap = new Map<number, [Room]>();
+        if (IncludeRoomNameInDeviceName) {
+            const houseRooms = await api.getHouseRooms(houseListHouse.HouseID);
+            const roomFetchTasks: Promise<Room>[] = [];
+            for(const room of houseRooms.RoomList) {
+                roomFetchTasks.push(api.getRoom(room.RoomID));
+            }
+
+            const rooms = await Promise.all(roomFetchTasks);
+            
+            for(const room of rooms) {
+                for (const device of room.DeviceList) {
+                    if (deviceAndSceneRoomMap.has(device.DeviceID)) {
+                        deviceAndSceneRoomMap.get(device.DeviceID).push(room);
+                    }
+
+                    deviceAndSceneRoomMap.set(device.DeviceID, [room]);
+                }
+
+                for (const scene of room.SceneList) {
+                    if (deviceAndSceneRoomMap.has(scene.SceneID)) {
+                        deviceAndSceneRoomMap.get(scene.SceneID).push(room);
+                    }
+
+                    deviceAndSceneRoomMap.set(scene.SceneID, [room]);
+                }
+            }
         }
 
-        // const rooms = await Promise.all(roomFetchTasks);
-        // const deviceRoomMap = new Map<number, [Room]>();
-        // if (IncludeRoomNameInDeviceName) {
-        //     for(const room of rooms)
-        // }
-
-        const homebridgeDeviceConfigs = [];
-        const unsupportedDeviceConfigs = [];
-        const ignoredDeviceConfigs = [];
+        const homebridgeDeviceConfigs: (HomebridgeDevice | HomebridgeScene)[] = [];
+        const unsupportedDeviceConfigs: Device[] = [];
+        const ignoredDeviceConfigs: Device[] = [];
         const devices = await Promise.all(deviceFetchTasks);
         for (const device of devices) {
-            const homebridgeConfig = getDeviceHomebridgeConfig(device);
-            if (homebridgeConfig === null || homebridgeConfig.deviceType === 'unsupported') {
+            const deviceRoomMemberships = deviceAndSceneRoomMap.has(device.DeviceID) ? deviceAndSceneRoomMap.get(device.DeviceID) : undefined;
+            const homebridgeConfig = getDeviceHomebridgeConfig(device, deviceRoomMemberships);
+            if (!homebridgeConfig || homebridgeConfig.deviceType === 'unsupported') {
                 unsupportedDeviceConfigs.push(device);
-            } else if(homebridgeConfig.deviceType === 'remote') {
+            } else if(IgnoredDeviceTypes.includes(homebridgeConfig.deviceType, 0)) {
                 ignoredDeviceConfigs.push(device);
             } else {
                 homebridgeDeviceConfigs.push(homebridgeConfig);
@@ -77,17 +97,18 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices. ${unsupportedDeviceConfigs.length} devices are unsuppored by homebridge. Ignored ${ignoredDeviceConfigs.length} devices`);
 
         const houseScenes = await api.getHouseScenes(houseListHouse.HouseID);
-        const sceneFetchTasks = [];
+        const sceneFetchTasks: Promise<Scene>[] = [];
         for (const scene of houseScenes.SceneList) {
             sceneFetchTasks.push(api.getScene(scene.SceneID));
         }
 
         const scenes = await Promise.all(sceneFetchTasks);
-        let processedScenes = [];
+        let processedScenes: Scene[] = [];
         for(const scene of scenes) {
             context.log(`Processing scene ${scene.SceneID}`);
+            const sceneRoomMemberships = deviceAndSceneRoomMap.has(scene.SceneID) ? deviceAndSceneRoomMap.get(scene.SceneID) : undefined;
             homebridgeDeviceConfigs.push(getSceneHomebridgeConfig(scene, devices, context));
-            processedScenes.push(processScene(scene, devices, context));
+            processedScenes.push(addDeviceNamesToSceneDevices(scene, devices, context));
         }
 
         const house = await api.getHouse(houseListHouse.HouseID);
@@ -121,26 +142,26 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
 };
 
-function getDeviceHomebridgeConfig(deviceProperties) {
-    const homebridgeDeviceType = DeviceTypes.getDeviceInfo(deviceProperties.DevCat, deviceProperties.SubCat);
-    const dimmable = (homebridgeDeviceType === null || homebridgeDeviceType.dimmable === undefined) ? 'no' : homebridgeDeviceType.dimmable;
+function getDeviceHomebridgeConfig(device: Device, rooms?: Room[]): HomebridgeDevice {
+    const homebridgeDeviceType = DeviceTypes.getDeviceInfo(device.DevCat, device.SubCat);
+    const dimmable = (!homebridgeDeviceType || !homebridgeDeviceType.dimmable) ? Dimmable.No : homebridgeDeviceType.dimmable;
     return {
-        name: deviceProperties.DeviceName,
-        deviceID: deviceProperties.InsteonID,
+        name: rooms?.length > 0 ? `${rooms[0].RoomName} ${device.DeviceName}` : device.DeviceName,
+        deviceID: device.InsteonID,
         deviceType: homebridgeDeviceType.homebridgeType,
         dimmable: dimmable
     };
 }
 
-function getSceneHomebridgeConfig(scene, allDevices, context) {
+function getSceneHomebridgeConfig(scene: Scene, allDevices: Device[], context: Context, rooms?: Room[]): HomebridgeScene {
     const sceneControllers = scene.DeviceList.filter(d => d.DeviceRoleMask === 1 || d.DeviceRoleMask === 3);
     context.log(`Found ${sceneControllers.length} scene controllers for ${scene.SceneID}: ${JSON.stringify(sceneControllers)}`);
 
-    let sceneController = null;
-    let sceneControllerKeypad = null;
+    let sceneController: SceneDevice = null;
+    let sceneControllerKeypad: Device = null;
     if (sceneControllers.length > 0) {
-        const controllers = []
-        const keypads = []
+        const controllers: SceneDevice[] = [];
+        const keypads: Device[] = [];
         for (const controller of sceneControllers) {
             const device = allDevices.filter(d => d.DeviceID === controller.DeviceID)[0];
             const deviceInfo = DeviceTypes.getDeviceInfo(device.DevCat, device.SubCat)
@@ -175,26 +196,20 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
     }
     groupMembers = groupMembers.substring(0, groupMembers.length - 1);
 
-    let config = {};
-    if (sceneControllerKeypad === null) {
-        config = {
-            ...config,
-            name: scene.SceneName,
-            groupID: scene.Group.toString(),
-            deviceType: 'scene'
-        };
-    }
-    else {
+    let config: HomebridgeScene = {
+        name: rooms?.length > 0 ? `${rooms[0].RoomName} ${scene.SceneName}` : scene.SceneName,
+        groupID: scene.Group.toString(),
+        deviceType: 'scene'
+    };
+    if (sceneControllerKeypad) {
         const sceneButton = sceneControllerKeypad.GroupList.filter(g => g.SceneID === scene.SceneID || g.DeviceGroupDetailID === sceneController.DeviceGroupDetailID)[0];
         const sceneButtonName = sceneButton.GroupName === 'Main Button' ? 'ON' : sceneButton.GroupName.substring(sceneButton.GroupName.length - 1);
         config = {
-            name: scene.SceneName,
-            groupID: scene.Group.toString(),
+            ...config,
             deviceID: sceneControllerKeypad.InsteonID,
             six_btn: sceneControllerKeypad.GroupList[0].GroupName === 'Main Button',
             keypadbtn: sceneButtonName,
-            dimmable: 'no',
-            deviceType: 'scene'
+            dimmable: Dimmable.No
         };
     }
 
@@ -208,15 +223,15 @@ function getSceneHomebridgeConfig(scene, allDevices, context) {
     return config;
 }
 
-function processScene(scene, allDevices, context) {
-    const updatedDeviceList = [];
+function addDeviceNamesToSceneDevices(scene: Scene, allDevices: Device[], context: Context) {
+    const updatedDeviceList: SceneDevice[] = [];
     for(const device of scene.DeviceList) {
         const deviceDetails = allDevices.filter(d => d.DeviceID === device.DeviceID)[0];
-
-        device.DeviceName = deviceDetails.DeviceName;
-        updatedDeviceList.push(device);
+        updatedDeviceList.push({
+            ...device,
+            DeviceName: deviceDetails.DeviceName
+        });
     }
-
 
     const updatedScene = {
         ...scene,

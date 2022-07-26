@@ -43,7 +43,7 @@ export class Api {
         const url = '/houses';
         try {
             const response = await this.axiosInstance.get(url);
-            return response.data.HouseList;
+            return response.data;
         } catch (error) {
             this.logAxiosError('Failed to get houses', error);
         }
@@ -70,7 +70,7 @@ export class Api {
     }
 
     async getRoom(roomId: number): Promise<DataModels.Room> {
-        const url = `/houses/${roomId}`;
+        const url = `/rooms/${roomId}`;
         try {
             const response = await this.axiosInstance.get(url);
             return response.data;

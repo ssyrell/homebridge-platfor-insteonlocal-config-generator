@@ -1,10 +1,14 @@
-interface DeviceType {
+export enum Dimmable {
+    Yes = "yes",
+    No = "no"
+};
+export interface DeviceType {
     category: number,
     subcategory: Number,
     sku: string,
     name: string,
     homebridgeType: string,
-    dimmable?: string,
+    dimmable?: Dimmable,
     canControlScenes?: boolean
 }
 
@@ -180,7 +184,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2456D3',
             name: 'LampLinc 3-Pin',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -188,7 +192,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476D',
             name: 'SwitchLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -196,7 +200,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2475D',
             name: 'In-LineLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -204,7 +208,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2876DB',
             name: 'ICON Dimmer Switch',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -212,7 +216,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476DH',
             name: 'SwitchLinc Dimmer (High Wattage)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -220,7 +224,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2484DWH8',
             name: 'Keypad Countdown Timer w/ Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -228,7 +232,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2456D2',
             name: 'LampLinc Dimmer (2-Pin)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -236,7 +240,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2856D2B',
             name: 'ICON LampLinc',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -244,7 +248,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476DT',
             name: 'SwitchLinc Dimmer Count-down Timer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -252,7 +256,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486D',
             name: 'KeypadLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -260,7 +264,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2886D',
             name: 'Icon In-Wall Controller',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -268,7 +272,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2632-422',
             name: 'Insteon Dimmer Module, France (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -276,7 +280,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486DWH8',
             name: 'KeypadLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -291,7 +295,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2457D2',
             name: 'LampLinc (Dual-Band)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -299,7 +303,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2632-432',
             name: 'Insteon Dimmer Module, Germany (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         null,
         {
@@ -308,7 +312,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2632-442',
             name: 'Insteon Dimmer Module, UK (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -316,7 +320,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2632-522',
             name: 'Insteon Dimmer Module, Aus/NZ (921 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -324,7 +328,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2676D - B',
             name: 'ICON SwitchLinc Dimmer Lixar/Bell Canada',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         null,
         null,
@@ -335,7 +339,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2466D',
             name: 'ToggleLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -343,7 +347,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2474D',
             name: 'Icon SwitchLinc Dimmer Inline Companion',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -351,7 +355,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476D',
             name: 'SwitchLinc Dimmer [with beeper]',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -359,7 +363,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2475D',
             name: 'In-LineLinc Dimmer [with beeper]',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -367,7 +371,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486DWH6',
             name: 'KeypadLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -375,7 +379,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486DWH8',
             name: 'KeypadLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -383,7 +387,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476DH',
             name: 'SwitchLinc Dimmer (High Wattage)[beeper]',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -391,7 +395,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2876DB',
             name: 'ICON Switch Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -399,7 +403,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2466Dx',
             name: 'ToggleLinc Dimmer [with beeper]',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -407,7 +411,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2477D',
             name: 'SwitchLinc Dimmer (Dual-Band)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -415,7 +419,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2472D',
             name: 'OutletLinc Dimmer (Dual-Band)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -423,7 +427,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2457D2X',
             name: 'LampLinc',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -431,7 +435,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2457D2EZ',
             name: 'LampLinc Dual-Band EZ',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -439,7 +443,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2474DWH',
             name: 'SwitchLinc 2-Wire Dimmer (RF)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -447,7 +451,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2475DA2',
             name: 'In-LineLinc 0-10VDC Dimmer/Dual-SwitchDB',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         null,
         null,
@@ -462,7 +466,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2477DH',
             name: 'SwitchLinc-Dimmer Dual-Band 1000W',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -477,7 +481,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2484DST6',
             name: 'KeypadLinc Schedule Timer with Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -485,7 +489,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2476D',
             name: 'SwitchLinc Dimmer',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -493,7 +497,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2478D',
             name: 'SwitchLinc Dimmer 240V-50/60Hz Dual-Band',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -501,7 +505,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2475DA1',
             name: 'In-LineLinc Dimmer (Dual Band)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         null,
         {
@@ -510,7 +514,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2452-222',
             name: 'Insteon DIN Rail Dimmer (915 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -518,7 +522,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2442-222',
             name: 'Insteon Micro Dimmer (915 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -526,7 +530,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2452-422',
             name: 'Insteon DIN Rail Dimmer (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -534,7 +538,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2452-522',
             name: 'Insteon DIN Rail Dimmer (921 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -542,7 +546,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2442-422',
             name: 'Insteon Micro Dimmer (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -550,7 +554,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2442-522',
             name: 'Insteon Micro Dimmer (921 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -558,7 +562,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-222',
             name: 'LED Bulb 240V (915 MHz) - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -566,7 +570,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-422',
             name: 'LED Bulb 240V Europe - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -574,7 +578,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-522',
             name: 'LED Bulb 240V Aus/NZ - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -582,7 +586,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2446-422',
             name: 'Insteon Ballast Dimmer (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -590,7 +594,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2446-522',
             name: 'Insteon Ballast Dimmer (921 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -598,7 +602,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2447-422',
             name: 'Insteon Fixture Dimmer (869 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -606,7 +610,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2447-522',
             name: 'Insteon Fixture Dimmer (921 MHz)',
             homebridgeType: 'dimmer',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -614,7 +618,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2334-222',
             name: 'Keypad Dimmer Dual-Band, 8 Button',
             homebridgeType: 'dimmer',
-            dimmable: 'yes',
+            dimmable: Dimmable.Yes,
             canControlScenes: true
         },
         {
@@ -623,7 +627,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2334-232',
             name: 'Keypad Dimmer Dual-Band, 6 Button',
             homebridgeType: 'dimmer',
-            dimmable: 'yes',
+            dimmable: Dimmable.Yes,
             canControlScenes: true
         },
         null,
@@ -638,7 +642,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2674-222',
             name: 'LED Bulb PAR38 US/Can - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -646,7 +650,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2674-422',
             name: 'LED Bulb PAR38 Europe - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -654,7 +658,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2674-522',
             name: 'LED Bulb PAR38 Aus/NZ - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -662,7 +666,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-432',
             name: 'LED Bulb 240V Europe - Bayonet Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -670,7 +674,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-532',
             name: 'LED Bulb 240V Aus/NZ - Bayonet Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -678,7 +682,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2674-432',
             name: 'LED Bulb PAR38 Europe - Bayonet Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -686,7 +690,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2674-532',
             name: 'LED Bulb PAR38 Aus/NZ - Bayonet Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -694,7 +698,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2632-452',
             name: 'Insteon Dimmer Module, Chile (915 MHz)',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         },
         {
             category: 1,
@@ -702,7 +706,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2672-452',
             name: 'LED Bulb 240V (915 MHz) - Screw-in Base',
             homebridgeType: 'lightbulb',
-            dimmable: 'yes'
+            dimmable: Dimmable.Yes
         }
     ],
 
@@ -719,7 +723,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2486SWH8',
             name: 'KeypadLinc 8-button On/Off Switch',
             homebridgeType: 'keypad',
-            dimmable: 'no',
+            dimmable: Dimmable.No,
             canControlScenes: true
         },
         {
@@ -903,7 +907,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2484SWH8',
             name: 'KeypadLinc 8-Button Countdown On/Off Switch Timer',
             homebridgeType: 'keypad',
-            dimmable: 'no'
+            dimmable: Dimmable.No
         },
         {
             category: 2,
@@ -911,7 +915,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2485SWH6',
             name: 'Keypad Schedule Timer with On/Off Switch',
             homebridgeType: 'keypad',
-            dimmable: 'no'
+            dimmable: Dimmable.No
         },
         null,
         null,
@@ -942,7 +946,7 @@ const deviceTypes: DeviceType[][] = [
             sku: '2487S',
             name: 'KeypadLinc On/Off (Dual-Band,50/60 Hz)',
             homebridgeType: 'keypad',
-            dimmable: 'no'
+            dimmable: Dimmable.No
         },
         {
             category: 2,

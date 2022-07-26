@@ -6,7 +6,7 @@ export interface AccessToken {
 };
 
 export interface HouseList {
-    HouseList: [HouseListHouse];
+    HouseList: HouseListHouse[];
 }
 
 export interface HouseListHouse {
@@ -37,18 +37,18 @@ export interface House {
 }
 
 export interface RoomListRoom {
-    RoomId: number,
-    HouseId: number,
+    RoomID: number,
+    HouseID: number,
     RoomName: string,
-    IconId: number
+    IconID: number
 };
 
 export interface RoomList {
-    RoomList: [RoomListRoom]
+    RoomList: RoomListRoom[];
 }
 
 export interface DeviceList {
-    DeviceList: [DeviceListDevice];
+    DeviceList: DeviceListDevice[];
 }
 
 export interface DeviceListDevice {
@@ -59,7 +59,7 @@ export interface DeviceListDevice {
 }
 
 export interface SceneList {
-    SceneList: [SceneListScene];
+    SceneList: SceneListScene[];
 }
 
 export interface SceneListScene {
@@ -111,7 +111,15 @@ export interface Device {
     };
     HasConnectedLight: boolean;
     BxmlSecondStatusGroup: boolean;
-    GroupList: []
+    GroupList: DeviceGroup[];
+}
+
+export interface DeviceGroup {
+    DeviceGroupDetailID: number;
+    GroupNum: number;
+    GroupName: string;
+    GroupState: number;
+    SceneID: number;
 }
 
 export interface Scene {
@@ -133,7 +141,7 @@ export interface Scene {
     TimerEnabled: boolean;
     EnableCustomOn: boolean;
     EnableCustomOff: boolean;
-    DeviceList: [SceneDevice]
+    DeviceList: SceneDevice[];
 }
 
 export interface SceneDevice {
@@ -142,6 +150,7 @@ export interface SceneDevice {
     DeviceRoleMask: number;
     RampRate: number;
     DeviceGroupDetailID: number;
+    DeviceName?: string;
 }
 
 export interface Room {
@@ -152,9 +161,9 @@ export interface Room {
     Favorite: boolean;
     Visible: boolean;
     DefaultCamera: number;
-    DeviceList: [RoomDevice];
-    SceneList: [RoomScene];
-    CameraList: [RoomCamera]
+    DeviceList: RoomDevice[];
+    SceneList: RoomScene[];
+    CameraList: RoomCamera[];
 }
 
 export interface RoomDevice {
