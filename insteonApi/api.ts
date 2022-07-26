@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 
-import { AccessToken } from './insteonDataModels';
+import * as DataModels from './insteonDataModels';
 import { Token } from '../dataModels'
 
 
@@ -28,7 +28,7 @@ export class Api {
         }
     
         try {
-            const response = await this.axiosInstance.post<AccessToken>(url, body, config);
+            const response = await this.axiosInstance.post<DataModels.AccessToken>(url, body, config);
             return {
                 token: response.data.access_token,
                 expiresIn: response.data.expires_in
@@ -39,7 +39,7 @@ export class Api {
         }
     }
 
-    async getHouses(): Promise<any> {
+    async getHouses(): Promise<DataModels.HouseList> {
         const url = '/houses';
         try {
             const response = await this.axiosInstance.get(url);
@@ -49,7 +49,7 @@ export class Api {
         }
     }
 
-    async getHouse(houseId: string): Promise<any> {
+    async getHouse(houseId: number): Promise<DataModels.House> {
         const url = `/houses/${houseId}`;
         try {
             const response = await this.axiosInstance.get(url);
@@ -59,7 +59,27 @@ export class Api {
         }
     }
 
-    async getHouseDevices(houseId: string): Promise<any> {
+    async getHouseRooms(houseId: number): Promise<DataModels.RoomList> {
+        const url = `/houses/${houseId}/rooms`
+        try {
+            const response = await this.axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            this.logAxiosError(`Failed to get rooms for hosue id ${houseId}`, error);
+        }
+    }
+
+    async getRoom(roomId: number): Promise<DataModels.Room> {
+        const url = `/houses/${roomId}`;
+        try {
+            const response = await this.axiosInstance.get(url);
+            return response.data;
+        } catch (error) {
+            this.logAxiosError(`Failed to get room with id of ${roomId}`, error);
+        }
+    }
+
+    async getHouseDevices(houseId: number): Promise<DataModels.DeviceList> {
         const url = `/houses/${houseId}/devices`;
         try {
             const response = await this.axiosInstance.get(url);
@@ -69,7 +89,7 @@ export class Api {
         }
     }
 
-    async getHouseScenes(houseId: string): Promise<any> {
+    async getHouseScenes(houseId: number): Promise<DataModels.SceneList> {
         const url = `/houses/${houseId}/scenes`;
         try {
             const response = await this.axiosInstance.get(url);
@@ -79,7 +99,7 @@ export class Api {
         }
     }
 
-    async getDevice(deviceId: string): Promise<any> {
+    async getDevice(deviceId: number): Promise<DataModels.Device> {
         const url = `/devices/${deviceId}`;
         try {
             const response = await this.axiosInstance.get(url);
@@ -89,7 +109,7 @@ export class Api {
         }
     }
 
-    async getScene(sceneId: string): Promise<any> {
+    async getScene(sceneId: number): Promise<DataModels.Scene> {
         const url = `/scenes/${sceneId}`;
         try {
             const response = await this.axiosInstance.get(url);

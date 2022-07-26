@@ -1,9 +1,10 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { parse } from 'querystring';
 
-import { Api, DeviceTypes } from '../insteonApi';
+import { Api, DeviceTypes, Room } from '../insteonApi';
 
 const IncludeGroupMembers = false;
+const IncludeRoomNameInDeviceName = false;
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     const parsedBody = parse(req.body);
@@ -32,11 +33,11 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     }
 
     const houses = await api.getHouses();
-    context.log(`Found ${houses.length} houses`);
+    context.log(`Found ${houses.HouseList.length} houses`);
     const configurations = [];
-    for (const house of houses)
+    for (const houseListHouse of houses.HouseList)
     {
-        const houseDevices = await api.getHouseDevices(house.HouseID);
+        const houseDevices = await api.getHouseDevices(houseListHouse.HouseID);
 
         // Get details for all devices
         const deviceFetchTasks = [];
@@ -45,6 +46,18 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         {
             deviceFetchTasks.push(api.getDevice(device.DeviceID));
         }
+
+        const houseRooms = await api.getHouseRooms(houseListHouse.HouseID);
+        const roomFetchTasks = [];
+        for(const room of houseRooms.RoomList) {
+            roomFetchTasks.push(api.getRoom(room.RoomId));
+        }
+
+        // const rooms = await Promise.all(roomFetchTasks);
+        // const deviceRoomMap = new Map<number, [Room]>();
+        // if (IncludeRoomNameInDeviceName) {
+        //     for(const room of rooms)
+        // }
 
         const homebridgeDeviceConfigs = [];
         const unsupportedDeviceConfigs = [];
@@ -63,7 +76,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         context.log(`Successfully got homebridge configurations for ${homebridgeDeviceConfigs.length} out of ${houseDevices.DeviceList.length} devices. ${unsupportedDeviceConfigs.length} devices are unsuppored by homebridge. Ignored ${ignoredDeviceConfigs.length} devices`);
 
-        const houseScenes = await api.getHouseScenes(house.HouseID);
+        const houseScenes = await api.getHouseScenes(houseListHouse.HouseID);
         const sceneFetchTasks = [];
         for (const scene of houseScenes.SceneList) {
             sceneFetchTasks.push(api.getScene(scene.SceneID));
@@ -77,6 +90,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             processedScenes.push(processScene(scene, devices, context));
         }
 
+        const house = await api.getHouse(houseListHouse.HouseID);
         configurations.push({
             homebridgeConfiguration: {
                 platform: 'InsteonLocal',
